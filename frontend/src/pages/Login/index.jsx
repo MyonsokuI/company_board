@@ -18,8 +18,9 @@ const Login = () => {
             const data = await login(loginId, password);
 
             // 成功時: トークン等を保存して遷移 (JWTの持ち方によって調整してください)
-            // localStorage.setItem('token', data.token); 
-
+            localStorage.setItem('accessToken', data.accessToken);
+            localStorage.setItem('userId', data.userId);
+            localStorage.setItem('userName', data.userName);
             navigate('/board');
         } catch (error) {
             // バックエンドからのエラーメッセージを表示するか、デフォルトを表示
