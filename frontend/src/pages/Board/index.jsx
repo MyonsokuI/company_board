@@ -42,7 +42,7 @@ const Board = () => {
                 body: content,
                 priority: importance,
                 publishedUntil: deadline,
-                createdBy: 1, // 仮のユーザーID、実際にはログインユーザーのIDを使用する
+                createdBy: 101, // 仮のユーザーID、実際にはログインユーザーのIDを使用する
             });
             // フォームクリア＆再描画
             handleClear();
