@@ -10,10 +10,19 @@ const Board = () => {
     const [deadline, setDeadline] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
 
+    // ログイン情報のステート（または変数）
+    const [userName, setUserName] = useState('');
+    const [userId, setUserId] = useState(null);
+    // 例: 数値に対応するラベルの定義
+    const priorityLabels = {
+        1: '低',
+        2: '中',
+        3: '高'
+    };
+
     const fetchNoticeList = async () => {
         try {
             const response = await getNotices();
-            // response.data が { notices: [...] } の形、または直接 [...] の形どちらでも対応できるようにする
             const noticeData = response.data.notices ? response.data.notices : response.data;
             setNotices(noticeData);
         } catch (error) {
@@ -22,6 +31,13 @@ const Board = () => {
     };
 
     useEffect(() => {
+        // マウント時にローカルストレージからログイン情報を取得
+        const storedUserName = localStorage.getItem('userName');
+        const storedUserId = localStorage.getItem('userId');
+
+        if (storedUserName) setUserName(storedUserName);
+        if (storedUserId) setUserId(storedUserId);
+
         fetchNoticeList();
     }, []);
 
@@ -36,13 +52,18 @@ const Board = () => {
             return;
         }
 
+        if (!userId) {
+            setErrorMessage('ログイン情報がありません。再度ログインしてください。');
+            return;
+        }
+
         try {
             await createNotice({
                 title,
                 body: content,
                 priority: importance,
                 publishedUntil: deadline,
-                createdBy: 101, // 仮のユーザーID、実際にはログインユーザーのIDを使用する
+                createdBy: Number(userId), // 取得したログインユーザーのIDをセット
             });
             // フォームクリア＆再描画
             handleClear();
@@ -78,7 +99,8 @@ const Board = () => {
         <div className={styles.container}>
             <header className={styles.header}>
                 <h1>社内連絡メモ・掲示板</h1>
-                <span>ログイン者：〇〇 〇〇</span>
+                {/* ログイン者名を動的に表示 */}
+                <span>ログイン者：{userName ? userName : 'ゲスト'}</span>
             </header>
 
             {/* 入力エリア */}
@@ -163,12 +185,12 @@ const Board = () => {
                     <tbody>
                         {notices.length > 0 ? (
                             notices.map((notice) => (
-                                <tr key={notice.noticeId}> {/* id -> noticeId に変更 */}
+                                <tr key={notice.noticeId}>
                                     <td>{notice.title}</td>
-                                    <td>{notice.body}</td>      {/* content -> body に変更 */}
-                                    <td>{notice.priority}</td>    {/* importance -> priority に変更 */}
-                                    <td>{notice.createUserName}</td> {/* author -> createUserName に変更 */}
-                                    <td>{notice.publishedUntil}</td> {/* deadline -> publishedUntil に変更 */}
+                                    <td>{notice.body}</td>
+                                    <td>{priorityLabels[notice.priority] || '不明'}</td>
+                                    <td>{notice.createUserName}</td>
+                                    <td>{notice.publishedUntil}</td>
                                     <td>
                                         <button onClick={() => handleDelete(notice.noticeId)}>削除</button>
                                     </td>
