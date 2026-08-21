@@ -12,6 +12,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface NoticeRepository extends JpaRepository<Notice, Integer> {
 
-    @Query("SELECT n FROM Notice n WHERE n.publishedUntil IS NULL OR n.publishedUntil >= :now ORDER BY n.createdAt DESC")
+    @Query("SELECT n FROM Notice n WHERE n.publishedUntil IS NULL OR n.publishedUntil >= :now ORDER BY n.publishedUntil ASC NULLS LAST")
     List<Notice> findValidNotices(@Param("now") LocalDate now, Pageable pageable);
 }
